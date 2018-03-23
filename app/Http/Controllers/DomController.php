@@ -35,15 +35,51 @@ class DomController extends  Controller
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             //'Cache-Control' => 'max-age=0'
         ];
-        $reponse2 = $client->request('GET','https://www.lazada.vn/catalog/?q='.$query, ['headers' => $header]);
+        $reponse2 = $client->request('GET','https://www.lotte.vn/catalogsearch/result/?q='.$query, ['headers' => $header]);
         //dd($reponse2);
         //echo $reponse2->getStatusCode();die;
         $result = $reponse2->getBody()->getContents();
-        $file = file_put_contents(storage_path('test.html'),$result);
+        print $result;
+//        $file = file_put_contents(storage_path('test.html'),$result);
+//
+//        $html = HtmlDomParser::file_get_html(storage_path('test.html'));
+//        echo $html;
 
-        $html = HtmlDomParser::file_get_html(storage_path('test.html'));
-        echo $html;
+
+
 
     }
+
+    public function getProductsLotte()
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://els.lotte.vn/api/v1/categories/687/products",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "{\"params\":{\"page\":0,\"hitsPerPage\":3000,\"facets\":[\"categories\",\"product_brand\",\"color\",\"size\",\"vendor\",\"product_brand_id\",\"vendor_id\"]}}",
+            CURLOPT_HTTPHEADER => array(
+                "Cache-Control: no-cache",
+                "Content-Type: application/json",
+                "Postman-Token: d64f9340-e3f6-438c-ba42-b3dc558db4d8"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+//         echo $response;
+         $obj = json_decode($response,true);
+//         dd($obj);
+//       foreach ($obj as $value)
+//       {
+//           echo $value['hits']->name;
+//       }
+
+    }
+
 
 }
