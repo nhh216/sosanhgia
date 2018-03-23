@@ -74,11 +74,16 @@ class DomController extends  Controller
 //         echo $response;
          $obj = json_decode($response,true);
 //         dd($obj);
-//       foreach ($obj as $value)
-//       {
-//           echo $value['hits']->name;
-//       }
-
+         $arr = $obj['hits'];
+//         dd($arr);
+         foreach ($arr as $value)
+         {
+             echo $value['name']. '<br>';
+             echo $value['thumbnail_url'] . '<br>';
+             echo $value['price_default'] . '<br>';
+             echo $value['url'] . '<br>';
+             echo $value['product_brand'] . '<br>';
+         }
     }
 
 
