@@ -183,7 +183,37 @@ class DomController extends  Controller
     public function  getPriceTiki()
     {
         $url = 'https://tiki.vn/dien-thoai-smartphone/c1795?src=tree';
-        $html = HtmlDomParser::file_get_html($url);
-        echo $html;
+//        $curl = curl_init();
+//
+//        curl_setopt_array($curl, array(
+//            CURLOPT_URL =>  $url,
+//            CURLOPT_RETURNTRANSFER => true,
+//            CURLOPT_ENCODING => "",
+//            CURLOPT_MAXREDIRS => 10,
+//            CURLOPT_TIMEOUT => 30,
+//            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+//            CURLOPT_CUSTOMREQUEST => "GET",
+//            CURLOPT_HTTPHEADER => array(
+//                "Cache-Control: no-cache",
+//                "Postman-Token: 61884b9d-687e-41f7-a1fc-a65da82b35e2"
+//            ),
+//        ));
+//
+//        $response = curl_exec($curl);
+//
+//            echo $response;
+        $client = new Client();
+        $header = [
+            'Accept-Encoding' => 'gzip, deflate, br',
+            'Accept-Language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/68.4.154 Chrome/62.4.3202.154 Safari/537.36',
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            //'Cache-Control' => 'max-age=0'
+        ];
+        $reponse2 = $client->request('GET',$url, ['headers' => $header]);
+        echo $reponse2->getBody()->getContents();
     }
+
+
+
 }
