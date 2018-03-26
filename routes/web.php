@@ -17,6 +17,4 @@ Route::get('/', function () {
 
 Route::get('/price','DomController@getPrice');
 Route::get('/lotte','DomController@getProductsLotte');
-Route::get('/lazada','DomController@getDataLazada');
-Route::get('/hoangha','DomController@getPriceHoangHa');
-Route::get('/tiki','DomController@getPriceTiki');
+Route::get('/lazada','DomController@getPriceLazada');
