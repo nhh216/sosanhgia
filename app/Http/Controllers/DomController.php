@@ -182,7 +182,7 @@ class DomController extends  Controller
 
     public function  getPriceTiki()
     {
-        $url = 'https://tiki.vn/dien-thoai-smartphone/c1795?src=tree';
+        $url = 'https://tiki.vn/dien-thoai-smartphone/c1795?src=tree&page=1';
 //        $curl = curl_init();
 //
 //        curl_setopt_array($curl, array(
