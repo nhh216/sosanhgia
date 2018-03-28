@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Controllers;
+use function simplehtmldom_1_5\file_get_html;
 use Sunra\PhpSimple\HtmlDomParser;
 use GuzzleHttp\Client;
 
@@ -144,15 +145,9 @@ class DomController extends  Controller
             ));
 
             $response = curl_exec($curl);
-            $err = curl_error($curl);
 
-            curl_close($curl);
-
-            if ($err) {
-                echo "cURL Error #:" . $err;
-            } else {
                 echo $response;
-            }
+
     }
 
 
@@ -213,6 +208,107 @@ class DomController extends  Controller
         $reponse2 = $client->request('GET',$url, ['headers' => $header]);
         echo $reponse2->getBody()->getContents();
     }
+
+    public  function getPriceNguyenKim()
+    {
+        $url = 'https://www.nguyenkim.com/dien-thoai-di-dong/page-1/';
+        $client = new Client();
+        $header = [
+            'Accept-Encoding' => 'gzip, deflate, br',
+            'Accept-Language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/68.4.154 Chrome/62.4.3202.154 Safari/537.36',
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            //'Cache-Control' => 'max-age=0'
+        ];
+        $reponse2 = $client->request('GET',$url, ['headers' => $header]);
+        echo $reponse2->getBody()->getContents();
+    }
+
+    public function  getPriceNhatCuong()
+    {
+        $url = 'https://www.dienthoaididong.com/ProductList/ListData?linkseo=/dien-thoai-di-dong&type=nganhhang&pagestart='. 40 .'&pagesize='. 20 .'&include=&ordertype=';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5",
+                "Cache-Control: no-cache",
+                "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
+                "Postman-Token: 1b2e1ed6-8ec0-4b0a-9556-62e1c231f143",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+                "X-Requested-With: XMLHttpRequest"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        echo $response;
+    }
+
+    public  function getPriceCellPhone()
+    {
+        $url = 'https://cellphones.com.vn/mobile.html?p=1';
+        $client = new Client();
+        $header = [
+            'Accept-Encoding' => 'gzip, deflate, br',
+            'Accept-Language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/68.4.154 Chrome/62.4.3202.154 Safari/537.36',
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            //'Cache-Control' => 'max-age=0'
+        ];
+        $response = $client->request('GET',$url, ['headers' => $header]);
+        $result = $response->getBody()->getContents();
+       file_put_contents(storage_path('html/cellphone.html'),$result);
+       $html = HtmlDomParser::file_get_html(storage_path('html/cellphone.html'));
+
+       foreach ( $html->find('ul[class=\'cols cols-5\']') as $element)
+       {
+           echo $element;
+
+       }
+
+    }
+
+    public  function getPriceHnam()
+    {
+
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://www.hnammobile.com/dien-thoai/?page=2",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => array(
+            "Cache-Control: no-cache",
+            "Postman-Token: 5ae15195-2694-43f7-b1d8-91665fc5089b"
+        ),
+    ));
+    $response = curl_exec($curl);
+
+    echo $response;
+
+    }
+
+    public  function getPriceAdayroi()
+    {
+
+        $url = 'https://www.adayroi.com/dien-thoai-android-c325?q=%3Arelevance&page=0';
+        $html = HtmlDomParser::file_get_html($url);
+        echo $html;
+
+
+    }
+
 
 
 
