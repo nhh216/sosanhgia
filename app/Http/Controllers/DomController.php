@@ -309,6 +309,36 @@ class DomController extends  Controller
 
     }
 
+    public  function  getPriceDienMayXanh()
+    {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://www.dienmayxanh.com/dien-thoai?page=6",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5",
+                "Cache-Control: no-cache",
+                "Connection: keep-alive",
+                "Postman-Token: a72fb434-254c-4dc3-b3e8-6747daf690d4",
+                "Upgrade-Insecure-Requests: 1",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+            echo $response;
+
+    }
+
 
 
 

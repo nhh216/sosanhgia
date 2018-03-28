@@ -24,3 +24,4 @@ Route::get('/nc','DomController@getPriceNhatCuong');
 Route::get('/cell','DomController@getPriceCellPhone');
 Route::get('/hnam','DomController@getPriceHnam');
 Route::get('/adayroi','DomController@getPriceAdayroi');
+Route::get('/dmx','DomController@getPriceDienMayXanh');
