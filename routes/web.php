@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::get('/price','DomController@getPrice');
 Route::get('/lotte','DomController@getProductsLotte');
-Route::get('/lazada','DomController@getPriceLazada');
+Route::get('/lazada','DomController@getDataLazada');
 Route::get('/tiki','DomController@getPriceTiki');
 Route::get('/nk','DomController@getPriceNguyenKim');
 Route::get('/nc','DomController@getPriceNhatCuong');
@@ -25,3 +25,4 @@ Route::get('/cell','DomController@getPriceCellPhone');
 Route::get('/hnam','DomController@getPriceHnam');
 Route::get('/adayroi','DomController@getPriceAdayroi');
 Route::get('/dmx','DomController@getPriceDienMayXanh');
+Route::get('/hoangha','DomController@getPriceHoangHa');
