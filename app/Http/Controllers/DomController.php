@@ -8,12 +8,13 @@
 
 
 namespace App\Http\Controllers;
+
 use App\Http\Controllers\Controller;
 use function simplehtmldom_1_5\file_get_html;
 use Sunra\PhpSimple\HtmlDomParser;
 use GuzzleHttp\Client;
 
-class DomController extends  Controller
+class DomController extends Controller
 {
 
     public function getPrice()
@@ -39,7 +40,7 @@ class DomController extends  Controller
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             //'Cache-Control' => 'max-age=0'
         ];
-        $reponse2 = $client->request('GET','https://www.lazada.vn/dien-thoai-di-dong/?'.$page, ['headers' => $header]);
+        $reponse2 = $client->request('GET', 'https://www.lazada.vn/dien-thoai-di-dong/?' . $page, ['headers' => $header]);
         //dd($reponse2);
         //echo $reponse2->getStatusCode();die;
         $result = $reponse2->getBody()->getContents();
@@ -53,13 +54,12 @@ class DomController extends  Controller
         preg_match("#<script>window.pageData=(.*)</script>#", $content, $match);
 
         $data = [];
-        if($match && isset($match[1])){
-            $data = json_decode($match[1] , true);
+        if ($match && isset($match[1])) {
+            $data = json_decode($match[1], true);
         }
 
         echo "<pre>";
         dd($data);
-
 
 
     }
@@ -86,9 +86,9 @@ class DomController extends  Controller
 
         $response = curl_exec($curl);
 //         echo $response;
-         $obj = json_decode($response,true);
+        $obj = json_decode($response, true);
 //         dd($obj);
-          $data =  array($obj);
+        $data = array($obj);
 //         dd($data);
 //         foreach ($arr as $value)
 //         {
@@ -100,21 +100,22 @@ class DomController extends  Controller
 //         }
 
 
-            for($i =0 ; $i< count($data[0]['hits']); $i++)
-            {
-                echo $i. '<br>' . ($data[0]['hits'][$i]['name']) . '<br>';
-            }
+        for ($i = 0; $i < count($data[0]['hits']); $i++) {
+            echo $i . '<br>' . ($data[0]['hits'][$i]['name']) . '<br>';
+        }
 
     }
 
-    public  function getDataLazada()
+    public function getPriceLazada($url)
     {
         $data = [];
         $content = "";
+        $head = "";
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://www.lazada.vn/dien-thoai-di-dong/samsung/?page=4&sort=priceasc",
+            CURLOPT_URL => $url,
+            CURLOPT_TIMEOUT => 6000,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
@@ -134,81 +135,123 @@ class DomController extends  Controller
         curl_close($curl);
         if ($err) {
             echo "cURL Error #:" . $err;
-        } else {
-            //echo $response;
         }
         $content = $response;
         preg_match("#<script>window.pageData=(.*)</script>#", $content, $match);
-        $result = [];
-        if($match && isset($match[1])){
-            $result = json_decode($match[1] , true);
-        }
-//        echo "<pre>";
-        dd($result['mods']['listItems']);
+        $head = $response;
+        preg_match("<link rel=\"next\" href=(.*)\">", $head, $match2);
 
+        $data = [];
 
-    }
-
-    public function  getPriceTGDD()
-    {
-
-
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://www.thegioididong.com/aj/CategoryV5/Product",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => "Category=42&Manufacture=0&PriceRange=0&Feature=0&Property=0&OrderBy=0&PageSize=3000&Others=&ClearCache=0",
-                CURLOPT_HTTPHEADER => array(
-                    "Accept: */*",
-                    "Accept-Encoding: gzip, deflate, br",
-                    "Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5",
-                    "Cache-Control: no-cache",
-                    "Connection: keep-alive",
-                    "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
-                    "Postman-Token: 935ab680-cf41-4565-958b-9a218857ee0b",
-                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
-                    "X-Requested-With: XMLHttpRequest"
-                ),
-            ));
-
-            $response = curl_exec($curl);
-
-                echo $response;
-
-    }
-
-
-    public function getPriceHoangHa()
-    {
-        $content = array();
-        $data =  array();
-        $baseUrl = 'https://hoanghamobile.com';
-        for ($i=1; $i<14;$i++)
-        {
-            $url = 'https://hoanghamobile.com/dien-thoai-di-dong-c14.html?sort=11&p='.$i;
-            $html = HtmlDomParser::file_get_html($url);
-            foreach ($html->find('.list-item') as $element)
-            {
-//                $content['name'] = $
-                echo $content['name'] = $element->find('div.product-name',0)->text() . '<br>';
-                echo $content['price'] = $element->find('div.product-price',0)->text(). '<br>';
-                echo $content['link'] = $baseUrl . $element->find('a',0)->getAttribute('href') .'<br>';
-                echo $content['image'] = $element->find('div.mosaic-backdrop img',0)->getAttribute('src') . '<br>';
-                array_push($data,$content);
+        if ($match && isset($match[1])) {
+            $data = json_decode($match[1], true);
+//            dd($data['mods']['listItems']);
+            for ($i = 0; $i < sizeof($data['mods']['listItems']); $i++) {
+                echo $data['mods']['listItems'][$i]['name'] . '<br>';
+                echo $data['mods']['listItems'][$i]['productUrl'] . '<br>';
+                echo $data['mods']['listItems'][$i]['image'] . '<br>';
+                echo $data['mods']['listItems'][$i]['price'] . '<br>';
+                echo $data['mods']['listItems'][$i]['brandName'] . '<br>';
+                echo $data['mods']['listItems'][$i]['sellerName'] . '<br>';
+                print_r($data['mods']['listItems'][$i]['description']);
+                echo '<br>';
             }
-
         }
-        dd($data);
+
+//        echo "<pre>";
+//        print_r($data['mods']['listItems']);
+
+
+        $nextPage = [];
+        if (isset($match2[0])) {
+            $nextPage = preg_split('/"/', $match2[0]);
+            echo $nextPage[3] . '<br>';
+//            $this->getPriceLazada($nextPage[3]);
+        } else {
+            echo "Done ------->";
+        }
+    }
+
+    public function getDataLazada()
+    {
+        $url = 'https://www.lazada.vn/dien-thoai-di-dong/apple--oppo--mobiistar--samsung--xiaomi--nokia--huawei/?page=1';
+        $this->getPriceLazada($url);
+    }
+
+
+    public function getPriceTGDD()
+    {
+
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://www.thegioididong.com/aj/CategoryV5/Product",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "Category=42&Manufacture=0&PriceRange=0&Feature=0&Property=0&OrderBy=0&PageSize=3000&Others=&ClearCache=0",
+            CURLOPT_HTTPHEADER => array(
+                "Accept: */*",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5",
+                "Cache-Control: no-cache",
+                "Connection: keep-alive",
+                "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
+                "Postman-Token: 935ab680-cf41-4565-958b-9a218857ee0b",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+                "X-Requested-With: XMLHttpRequest"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        echo $response;
 
     }
 
-    public function  getPriceTiki()
+    public function getPriceHoangHa($url)
+    {
+        $html = HtmlDomParser::file_get_html($url);
+        $baseUrl = 'https://hoanghamobile.com';
+        foreach ($html->find('.list-item') as $element) {
+
+            echo $content['name'] = $element->find('div.product-name', 0)->text() . '<br>';
+            echo $content['price'] = $element->find('div.product-price', 0)->text() . '<br>';
+            echo $content['link'] = $baseUrl . $element->find('a', 0)->getAttribute('href') . '<br>';
+            echo $content['image'] = $element->find('div.mosaic-backdrop img', 0)->getAttribute('src') . '<br>';
+//            array_push($data,$content);
+        }
+    }
+
+    public function HoangHa()
+    {
+        $url = 'https://hoanghamobile.com/dien-thoai-di-dong-c14.html?sort=11&p=1';
+        $baseUrl = 'https://hoanghamobile.com';
+        $html = HtmlDomParser::file_get_html($url);
+        $nextPage = $html->find('div[class=\'paging\']');
+        $lastPage = $nextPage[0]->children(6)->attr['href'];
+        $listPage = preg_split('~p=~', $lastPage);
+        $indexOfLastPage = $listPage[1];
+        for ($i = 1; $i < $indexOfLastPage + 1; $i++) {
+            $this->getPriceHoangHa('https://hoanghamobile.com/dien-thoai-di-dong-c14.html?sort=11&p=' . 1);
+        }
+
+//            foreach ($html->find('.list-item') as $element)
+//            {
+//                $content['name'] = $
+//                echo $content['name'] = $element->find('div.product-name',0)->text() . '<br>';
+//                echo $content['price'] = $element->find('div.product-price',0)->text(). '<br>';
+//                echo $content['link'] = $baseUrl . $element->find('a',0)->getAttribute('href') .'<br>';
+//                echo $content['image'] = $element->find('div.mosaic-backdrop img',0)->getAttribute('src') . '<br>';
+//                array_push($data,$content);
+//            }
+    }
+
+    public function getPriceTiki()
     {
         $url = 'https://tiki.vn/dien-thoai-smartphone/c1795?order=price%2Casc';
         $this->getUrlTiki($url);
@@ -223,42 +266,38 @@ class DomController extends  Controller
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/68.4.154 Chrome/62.4.3202.154 Safari/537.36',
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         ];
-        $reponse2 = $client->request('GET',$url, ['headers' => $header]);
+        $reponse2 = $client->request('GET', $url, ['headers' => $header]);
         $respon = $reponse2->getBody()->getContents();
 //        file_put_contents(storage_path('html/tiki.txt'),$reponse2->getBody()->getContents());
 //        $content = file_get_contents(storage_path('html/tiki.txt'));
 //        $partOfContent = [];
-        $partOfContent = preg_split('<!--  BEGIN GOOGLE TAGMANAGER -->',$respon);
-        file_put_contents(storage_path('html/tiki-head.html'),$partOfContent[0]);
+        $partOfContent = preg_split('<!--  BEGIN GOOGLE TAGMANAGER -->', $respon);
+        file_put_contents(storage_path('html/tiki-head.html'), $partOfContent[0]);
 
         $partOfContentBody = [];
-        $partOfContentBody =  preg_split('</nav>',$partOfContent[1]);
-        file_put_contents(storage_path('html/tiki-body.html'),$partOfContentBody[1]);
+        $partOfContentBody = preg_split('</nav>', $partOfContent[1]);
+        file_put_contents(storage_path('html/tiki-body.html'), $partOfContentBody[1]);
 
         $html = HtmlDomParser::file_get_html(storage_path('html/tiki-head.html'));
         $htmlBody = HtmlDomParser::file_get_html(storage_path('html/tiki-body.html'));
-        $str =  $html->find('link[rel=\'next\']');
+        $str = $html->find('link[rel=\'next\']');
 
         $listProduct = $htmlBody->find('div[class="product-item"]');
         $price = 'data-price';
         $title = 'data-title';
         $price = 'data-price';
-        foreach ($listProduct as $listPr)
-        {
+        foreach ($listProduct as $listPr) {
             echo $listPr->children[0]->href . '<br>';
-            if(isset($listPr->children(0)->children(0)->children(0)->src))
-            {
-                echo $img =  ($listPr->children(0)->children(0)->children(0))->src . '<br>';
+            if (isset($listPr->children(0)->children(0)->children(0)->src)) {
+                echo $img = ($listPr->children(0)->children(0)->children(0))->src . '<br>';
             }
-            echo $listPr->$title. '<br>';
-            echo $listPr->$price. '<br>';
+            echo $listPr->$title . '<br>';
+            echo $listPr->$price . '<br>';
         }
 
-        if(isset($str))
-        {
-            if( isset($str['0']))
-            {
-                echo  $newUrl =$str['0']->attr['href'] . '<br>';
+        if (isset($str)) {
+            if (isset($str['0'])) {
+                echo $newUrl = $str['0']->attr['href'] . '<br>';
                 $this->getUrlTiki($newUrl);
             }
         }
@@ -266,25 +305,37 @@ class DomController extends  Controller
 
     }
 
-
-    public  function getPriceNguyenKim()
+    public function NK($url)
     {
-        $url = 'https://www.nguyenkim.com/dien-thoai-di-dong/page-1/';
-        $client = new Client();
-        $header = [
-            'Accept-Encoding' => 'gzip, deflate, br',
-            'Accept-Language' => 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/68.4.154 Chrome/62.4.3202.154 Safari/537.36',
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            //'Cache-Control' => 'max-age=0'
-        ];
-        $reponse2 = $client->request('GET',$url, ['headers' => $header]);
-        echo $reponse2->getBody()->getContents();
+        echo $url . '<br>';
+        $html = HtmlDomParser::file_get_html($url);
+
+        $dom = $html->find('a[class=\'ty-pagination__next\']');
+
+        if ($url == 'https://www.nguyenkim.com/dien-thoai-di-dong/page-1/') {
+            $np = $dom[0]->attr['href'];
+            $this->NK($np);
+        }
+        if ($url == 'https://www.nguyenkim.com/dien-thoai-di-dong/page-17/') {
+
+            return 0;
+        } else {
+            if (isset($dom[1])) {
+                $np = $dom[1]->attr['href'];
+                $this->NK($np);
+            }
+        }
     }
 
-    public function  getPriceNhatCuong()
+    public function getPriceNguyenKim()
     {
-        $url = 'https://www.dienthoaididong.com/ProductList/ListData?linkseo=/dien-thoai-di-dong&type=nganhhang&pagestart='. 40 .'&pagesize='. 20 .'&include=&ordertype=';
+        $url = 'https://www.nguyenkim.com/dien-thoai-di-dong/page-1/';
+        $this->NK($url);
+    }
+
+    public function getPriceNhatCuong()
+    {
+        $url = 'https://www.dienthoaididong.com/ProductList/ListData?linkseo=/dien-thoai-di-dong&type=nganhhang&pagestart=' . 40 . '&pagesize=' . 20 . '&include=&ordertype=';
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
@@ -306,11 +357,13 @@ class DomController extends  Controller
         ));
 
         $response = curl_exec($curl);
-
-        echo $response;
+        file_put_contents(storage_path('html/nhatcuong.html'),$response);
+        $html = HtmlDomParser::file_get_html(storage_path('html/nhatcuong.html'));
+        $dom = $html->find('li.item-product');
+        dd($dom[0]);
     }
 
-    public  function getPriceCellPhone()
+    public function getPriceCellPhone()
     {
         $url = 'https://cellphones.com.vn/mobile.html?p=1';
         $client = new Client();
@@ -321,40 +374,39 @@ class DomController extends  Controller
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             //'Cache-Control' => 'max-age=0'
         ];
-        $response = $client->request('GET',$url, ['headers' => $header]);
+        $response = $client->request('GET', $url, ['headers' => $header]);
         $result = $response->getBody()->getContents();
-       file_put_contents(storage_path('html/cellphone.html'),$result);
-       $html = HtmlDomParser::file_get_html(storage_path('html/cellphone.html'));
+        file_put_contents(storage_path('html/cellphone.html'), $result);
+        $html = HtmlDomParser::file_get_html(storage_path('html/cellphone.html'));
 
-       foreach ( $html->find('ul[class=\'cols cols-5\']') as $element)
-       {
-           echo $element;
-       }
+        foreach ($html->find('ul[class=\'cols cols-5\']') as $element) {
+            echo $element;
+        }
     }
 
-    public  function getPriceHnam()
+    public function getPriceHnam()
     {
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://www.hnammobile.com/dien-thoai/?page=2",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => array(
-            "Cache-Control: no-cache",
-            "Postman-Token: 5ae15195-2694-43f7-b1d8-91665fc5089b"
-        ),
-    ));
-    $response = curl_exec($curl);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://www.hnammobile.com/dien-thoai/?page=2",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Cache-Control: no-cache",
+                "Postman-Token: 5ae15195-2694-43f7-b1d8-91665fc5089b"
+            ),
+        ));
+        $response = curl_exec($curl);
 
-    echo $response;
+        echo $response;
 
     }
 
-    public  function getPriceAdayroi()
+    public function getPriceAdayroi()
     {
 
         $url = 'https://www.lazada.vn/dien-thoai-di-dong/apple--huawei--samsung--xiaomi--masstel--nokia--oppo/?sort=priceasc';
@@ -364,7 +416,7 @@ class DomController extends  Controller
 
     }
 
-    public  function  getPriceDienMayXanh()
+    public function getPriceDienMayXanh()
     {
 
         $curl = curl_init();
@@ -390,11 +442,11 @@ class DomController extends  Controller
         ));
 
         $response = curl_exec($curl);
-            echo $response;
+        echo $response;
 
     }
 
-    public  static  function getPriceHoangHa2()
+    public function getPriceHoangHa2()
     {
 
         $url = "https://hoanghamobile.com/dien-thoai-di-dong-c14.html?sort=11&p=2";
@@ -416,9 +468,26 @@ class DomController extends  Controller
 
         $response = curl_exec($curl);
 
-            echo $response;
+        echo $response;
 
+    }
+
+    public function getPriceVuiVui()
+    {
+        $index = 1;
+        while ($index < 6) {
+            $url = 'https://www.vuivui.com/dien-thoai-di-dong/?page=' . $index . '&sort=PriceDesc';
+            $html = HtmlDomParser::file_get_html($url);
+            $dom = $html->find('div.[class=\'itmpro\']');
+            for ($i = 1; $i < sizeof($dom); $i++) {
+                echo $link_pro = $dom[$i]->children(0)->attr['href'] . '<br>';
+                echo $name_pro = $dom[$i]->children(1)->plaintext . '<br>';
+                echo $link_img = $dom[$i]->children(0)->children(0)->attr['data-src'] . '<br>';
+            }
+            $index++;
         }
+
+    }
 
 
 }
